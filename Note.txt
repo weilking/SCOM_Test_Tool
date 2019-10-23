@@ -1,0 +1,12 @@
+2019-10-23
+1. Implemented List run
+
+TODO:
+Signal-slot polar
+
+2018-10-26
+1. TODO: add single shot message.
+button -> scom editor -> queue -> execute
+
+2018-11-11
+ToDO: load scom list
