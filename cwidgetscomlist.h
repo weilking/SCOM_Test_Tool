@@ -40,6 +40,8 @@ private:
 
     QStringList sListCommandListHeader;
 
+    bool bCommandListRun;
+
 signals:
 
     void SignalAskForScomQueueItemFromEditorToList(void);
@@ -48,7 +50,7 @@ signals:
 
     void SignalScomQueueItemToEditorReady(void);
 
-    void SignalScomQueueItemEmpty(void);
+    void SignalScomQueueItemEmpty(bool bEmpty);
 
     //signal to output to log box
     void SignalLogOutput(QString sLog);
@@ -77,6 +79,9 @@ public slots:
 
     //slot to receive run result of scom queue
     void PublicSlotScomQueueItemFinish(hd_common::e_Error eRet);
+
+    //Slot to accept scom list run/cancel
+    void PublicSlotScomQueueRunCancel(bool bRunCancel);
 };
 
 #endif // CWIDGETSCOMLIST_H

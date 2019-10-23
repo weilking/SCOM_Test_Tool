@@ -142,6 +142,16 @@ void CWidgetControlPanel::PrivateSlotSingleShot()
 //Private Slot: Start Script sending
 void CWidgetControlPanel::PrivateSlotRun(bool bRunCancel)
 {
+    //If canceled
+    if(!bRunCancel)
+    {
+        qPushButtonRun->setText("Run Script");
+    }
+    else
+    {
+        qPushButtonRun->setText("Cancel");
+
+    }
     //emit Run/Cancel Script signal
     emit SignalButtonRun(bRunCancel);
 }
@@ -163,5 +173,6 @@ void CWidgetControlPanel::PublicSlotSingleShot()
 
 void CWidgetControlPanel::PublicSlotRun(bool bRunCancel)
 {
-
+    qPushButtonRun->setText("Run Script");
+    qPushButtonRun->setChecked(false);
 }

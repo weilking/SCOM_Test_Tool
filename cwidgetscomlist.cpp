@@ -92,6 +92,9 @@ CWidgetScomList::CWidgetScomList(QWidget *parent) : QWidget(parent)
     connect(qPushButtonSave,SIGNAL(clicked(bool)), this, SLOT(PrivateSlotSaveList()));
     connect(qPushButtonLoad, SIGNAL(clicked(bool)), this, SLOT(PrivateSlotLoadList()));
 
+
+    //Initialize command list
+    bCommandListRun = false;
 }
 
 void CWidgetScomList::OutputDebugLog(QString sFunction, QString sType, e_Error Code)
@@ -361,7 +364,7 @@ void CWidgetScomList::PublicSlotCopyScomQueueItemToEditor(void)
         //No data in current row
         //notify the list is finished.
         OutputDebugLog(__FUNCTION__, "STATUS" , "SCOM List Run is over!");
-        emit SignalScomQueueItemEmpty();
+        emit SignalScomQueueItemEmpty(true);
     }
     else
     {
@@ -386,6 +389,23 @@ void CWidgetScomList::PublicSlotScomQueueItemFinish(e_Error eRet)
     //call public slot: get next item
     qTableViewScomList->setCurrentCell(qTableViewScomList->currentRow() + 1, 0);
 
-    PublicSlotCopyScomQueueItemToEditor();
+    if(!bCommandListRun)
+    {
+        OutputDebugLog(__FUNCTION__, "STATUS" , "SCOM List Run is cancelled!");
+    }
+    else
+    {
+        PublicSlotCopyScomQueueItemToEditor();
+    }
+}
 
+void CWidgetScomList::PublicSlotScomQueueRunCancel(bool bRunCancel)
+{
+    bCommandListRun = bRunCancel;
+
+    if(true == bCommandListRun)
+    {
+        OutputDebugLog(__FUNCTION__, "STATUS" , "SCOM List Run is started!");
+        PublicSlotCopyScomQueueItemToEditor();
+    }
 }

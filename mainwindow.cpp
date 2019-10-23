@@ -59,7 +59,7 @@ void MainWindow::ConnectSignalSlots()
     //Connect mWidgetControlPanel with mWidgetScomEditor
     connect(mWidgetControlPanel, SIGNAL(SignalButtonSingleShot()), mWidgetSCOMEditor, SLOT(PublicSlotRequestScomEditorDataToScomQueue()));
     //Connect mWidgetControlPanel with mWidgetScomList
-    connect(mWidgetControlPanel, SIGNAL(SignalButtonRun(bool)), mWidgetScomList, SLOT(PublicSlotCopyScomQueueItemToEditor()));
+    connect(mWidgetControlPanel, SIGNAL(SignalButtonRun(bool)), mWidgetScomList, SLOT(PublicSlotScomQueueRunCancel(bool)));
 
 
     //Connect mWidgetSerialPort with mScomQueue
@@ -81,6 +81,7 @@ void MainWindow::ConnectSignalSlots()
 
     //Connect mWidgetScomList to mWidgetControlPanel
     connect(mWidgetScomList, SIGNAL(SignalScomQueueItemToEditorReady()), mWidgetControlPanel, SLOT(PublicSlotSingleShot()));
+    connect(mWidgetScomList, SIGNAL(SignalScomQueueItemEmpty(bool)), mWidgetControlPanel, SLOT(PublicSlotRun(bool)));
 
     //Connect mScomQueue with mWidgetScomList
     connect(mScomQueue, SIGNAL(SignalScomQueueFinish(hd_common::e_Error)), mWidgetScomList,SLOT(PublicSlotScomQueueItemFinish(hd_common::e_Error)));
