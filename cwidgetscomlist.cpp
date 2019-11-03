@@ -173,10 +173,10 @@ bool CWidgetScomList::PrivateSlotCopyScomQueueItem()
         mScomEditData.qStringMaxRepeatTimes = qTableViewScomList->item(qTableViewScomList->currentRow(),sListCommandListHeader.indexOf("TIMES"))->text();
 
         QString qStringTmp = qTableViewScomList->item(qTableViewScomList->currentRow(),sListCommandListHeader.indexOf("CRITICAL"))->text();
-        mScomEditData.bCritical = qStringTmp.isEmpty();
+        mScomEditData.bCritical = qStringTmp.contains('Y');
 
         qStringTmp = qTableViewScomList->item(qTableViewScomList->currentRow(),sListCommandListHeader.indexOf("WAIT"))->text();
-        mScomEditData.bWaitUntil = qStringTmp.isEmpty();
+        mScomEditData.bWaitUntil = qStringTmp.contains('Y');
 
         //Emit signal to scom edit box
         emit SignalMoveScomQueueItemFromListToEditor(mScomEditData);
@@ -386,16 +386,26 @@ void CWidgetScomList::PublicSlotScomQueueItemFinish(e_Error eRet)
         qTableViewScomList->item(qTableViewScomList->currentRow(),sListCommandListHeader.indexOf("CMDID"))->setBackgroundColor(Qt::red);
     }
 
-    //call public slot: get next item
-    qTableViewScomList->setCurrentCell(qTableViewScomList->currentRow() + 1, 0);
 
-    if(!bCommandListRun)
+    if(qTableViewScomList->item(qTableViewScomList->currentRow(),sListCommandListHeader.indexOf("CRITICAL"))->text().contains('Y'))
     {
-        OutputDebugLog(__FUNCTION__, "STATUS" , "SCOM List Run is cancelled!");
+        emit SignalScomQueueItemEmpty(true);
+        OutputDebugLog(__FUNCTION__, "STATUS" , "SCOM List Run is cancelled, fail in critical task!");
     }
     else
     {
-        PublicSlotCopyScomQueueItemToEditor();
+
+        //call public slot: get next item
+        qTableViewScomList->setCurrentCell(qTableViewScomList->currentRow() + 1, 0);
+
+        if(!bCommandListRun)
+        {
+            OutputDebugLog(__FUNCTION__, "STATUS" , "SCOM List Run is cancelled!");
+        }
+        else
+        {
+            PublicSlotCopyScomQueueItemToEditor();
+        }
     }
 }
 
@@ -406,6 +416,18 @@ void CWidgetScomList::PublicSlotScomQueueRunCancel(bool bRunCancel)
     if(true == bCommandListRun)
     {
         OutputDebugLog(__FUNCTION__, "STATUS" , "SCOM List Run is started!");
+        //Clear the colors
+        for(int i = 0; i < qTableViewScomList->rowCount()-1;i ++)
+        {
+            qTableViewScomList->item(i,sListCommandListHeader.indexOf("CMDID"))->setBackgroundColor(Qt::white);
+        }
+
+
         PublicSlotCopyScomQueueItemToEditor();
     }
+    else
+    {
+        OutputDebugLog(__FUNCTION__, "STATUS" , "SCOM List Run is cancelled!");
+    }
+
 }

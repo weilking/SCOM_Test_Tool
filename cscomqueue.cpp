@@ -33,10 +33,14 @@ e_Error CScomQueue::Start()
     //clear message list
     mListSCOMQueue.clear();
 
+    bTerminate = false;
+
+    connect(&mDelayTimer,SIGNAL(timeout()),this,SLOT(DelayTimeoutRoutine()));
+
     return eRet;
 }
 
-e_Error CScomQueue::Stop()
+e_Error CScomQueue:: Stop()
 {
     //Stop SCOM Worker
 
@@ -45,6 +49,8 @@ e_Error CScomQueue::Stop()
     eRet = mScomWorker.Stop();
 
     OutputDebugLog(__FUNCTION__, "PASS" , eRet);
+
+    bTerminate = true;
 
     return eRet;
 }
@@ -133,6 +139,27 @@ void CScomQueue::OutputDebugLog(QString sFunction, QString sType, e_Error code)
     return;
 }
 
+void CScomQueue::OutputDebugLog(QString sFunction, QString sType, QString sText)
+{
+    QString sStringOutput;
+
+    sStringOutput = QString("[%3]%1[%2][%4]").arg(CScomQueue_DEBUG_PREFIX, sFunction, sType, sText);
+
+    qDebug() << sStringOutput;
+
+    //Emit signal to log box receiving slot
+    emit SignalLogOutput(sStringOutput);
+
+    return;
+}
+
+void CScomQueue::DelayTimeoutRoutine()
+{
+    mDelayTimer.stop();
+    //delayed emit scom queue finish, only for e_OK
+    emit SignalScomQueueFinish(e_OK);
+}
+
 void CScomQueue::PublicSlotExecuteRead(int iNumber)
 {
     e_Error eRet = e_OK;
@@ -141,8 +168,6 @@ void CScomQueue::PublicSlotExecuteRead(int iNumber)
 
 
     mSCOMQueueItemExecute = mListSCOMQueue.front();
-
-
     if(iNumber == 0)
     {
         //No message is received, Receive Timeout
@@ -171,27 +196,71 @@ void CScomQueue::PublicSlotExecuteRead(int iNumber)
     }
 
     //Disconnect signal to slot
-     QObject::disconnect(&mScomWorker,SIGNAL(Message_Available(int)),this, 0);
+    QObject::disconnect(&mScomWorker,SIGNAL(Message_Available(int)),this, 0);
 
      //Remove the front item in queue
      mListSCOMQueue.removeFirst();
 
-     //If repeat time is not zero, reinsert the message again.
+     //If repeat time is not zero && not wait until success, reinsert the message again.
      if(eRet != e_OK)
      {
          if(mSCOMQueueItemExecute.uintMaxRepeatTime > 1)
          {
              -- mSCOMQueueItemExecute.uintMaxRepeatTime;
-             PublicSlotInsertSCOMQueueAndShot(mSCOMQueueItemExecute);
-             return;
+             if(!bTerminate)
+             {
+                PublicSlotInsertSCOMQueueAndShot(mSCOMQueueItemExecute);
+                return;
+             }
          }
-      }
+     }
+     else if(eRet == e_OK && !mSCOMQueueItemExecute.bWaitUntil)
+     {
+         if(mSCOMQueueItemExecute.uintMaxRepeatTime > 1)
+         {
+             -- mSCOMQueueItemExecute.uintMaxRepeatTime;
+             if(!bTerminate)
+             {
+                PublicSlotInsertSCOMQueueAndShot(mSCOMQueueItemExecute);
+                return;
+             }
+         }
+     }
+     else
+     {
+         if(mSCOMQueueItemExecute.uintDelayAfter > 0)
+         {
+             //start delay timer
+            mDelayTimer.setInterval(mSCOMQueueItemExecute.uintDelayAfter);
+            mDelayTimer.start();
+
+            QString sTmp;
+            sTmp = QString("Delay %1 ms").arg(mSCOMQueueItemExecute.uintDelayAfter);
+
+            OutputDebugLog(__FUNCTION__, "STATUS" , sTmp);
+            return;
+         }
+
+     }
 
      //emit signal success/fail
      emit SignalScomQueueFinish(eRet);
 
-
      return;
+}
+
+
+//Public slot to terminate queue and shot
+void CScomQueue::PublicSlotTerminateQueueAndShot(bool bRunCancel)
+{
+    bTerminate = !bRunCancel;
+
+    //If delay is running
+    if(mDelayTimer.isActive())
+    {
+        //call timeout routine directly
+        mDelayTimer.stop();
+    }
 }
 
 //Public Slot to receive serial port change signal

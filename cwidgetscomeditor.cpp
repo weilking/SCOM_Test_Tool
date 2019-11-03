@@ -255,6 +255,7 @@ void CWidgetSCOMEditor::PublicSlotRequestScomEditorDataToScomQueue()
     mScomQueueItem.bCritical = qCheckBoxCritical->isChecked();
     mScomQueueItem.uintDelayAfter = qLineEditDelayAfter->text().toInt();
     mScomQueueItem.uintMaxRepeatTime = qLineEditTimes->text().toInt();
+    mScomQueueItem.bWaitUntil = qCheckBoxWaitUntil->isChecked();
 
     emit SignalResponseScomEditorDataToScomQueue(mScomQueueItem);
 
@@ -367,6 +368,7 @@ void CWidgetSCOMEditor::PublicSlotMoveScomEditorDataFromList(ScomEditData mScomE
     qCheckBoxWaitUntil->setChecked(mScomEditData.bWaitUntil);
 
     qLineEditDelayAfter->setText(mScomEditData.qStringDelayAfter);
+
     qCheckBoxCritical->setChecked(mScomEditData.bCritical);
 
 }

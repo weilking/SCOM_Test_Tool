@@ -55,7 +55,7 @@ void MainWindow::ConnectSignalSlots()
 
     //Connect mWidgetControlPanel with mScomQueue
     connect(mWidgetControlPanel, SIGNAL(SignalButtonStart(bool)), mScomQueue, SLOT(PublicSlotStartSCOMQueue(bool)));
-
+    connect(mWidgetControlPanel, SIGNAL(SignalButtonRun(bool)), mScomQueue, SLOT(PublicSlotTerminateQueueAndShot(bool)));
     //Connect mWidgetControlPanel with mWidgetScomEditor
     connect(mWidgetControlPanel, SIGNAL(SignalButtonSingleShot()), mWidgetSCOMEditor, SLOT(PublicSlotRequestScomEditorDataToScomQueue()));
     //Connect mWidgetControlPanel with mWidgetScomList

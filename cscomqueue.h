@@ -24,6 +24,7 @@ namespace HD_SCOM {
         unsigned int uintDelayAfter;
         unsigned int uintMaxRepeatTime;
         bool bCritical;
+        bool bWaitUntil;
         bool bResult;
     };
 }
@@ -56,6 +57,10 @@ namespace HD_SCOM {
         // Output debug log
         void OutputDebugLog(QString sFunction, QString sType, hd_common::e_Error Code);
 
+
+        // Output debug log
+        void OutputDebugLog(QString sFunction, QString sType, QString sText);
+
     private:
         //SCOM execution queue
         QList<SCOMQueueItem> mListSCOMQueue;
@@ -65,6 +70,15 @@ namespace HD_SCOM {
 
         //SCOM Worker
         CScomWorker mScomWorker;
+
+        //global flag whether queue should be terminated
+        bool bTerminate = false;
+
+
+        ///Timer used for delay after message
+        QTimer mDelayTimer;
+
+
 
     signals:
 
@@ -77,6 +91,9 @@ namespace HD_SCOM {
         //signal to output to log box
         void SignalLogOutput(QString sLog);
 
+    private slots:
+
+        void DelayTimeoutRoutine(void);
 
     public slots:
         //Configure SCOM Worker Serial port
@@ -100,6 +117,8 @@ namespace HD_SCOM {
         //Execute SCOM Queue Item from Front Read
         void PublicSlotExecuteRead(int number);
 
+        //Public slot to terminate current queue and shot
+        void PublicSlotTerminateQueueAndShot(bool bRunCancel);
 
 
 
