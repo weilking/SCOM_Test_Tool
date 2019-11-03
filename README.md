@@ -6,5 +6,8 @@ Feature list
 - Single command shot
 - Script command list
 
-Claims:
-- The application 
+Claim
+- The application is created for the purpose of debugging and testing SCOM protocol.
+- SCOM protocol refers to Hatteland service document.
+- The application is created as personal hobby project and has no connection with any commecial product.
+- Follow MIT license
