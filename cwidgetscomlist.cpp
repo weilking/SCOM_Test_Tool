@@ -61,11 +61,11 @@ CWidgetScomList::CWidgetScomList(QWidget *parent) : QWidget(parent)
     qTableViewScomList = new QTableWidget(this);
 
 
-    qTableViewScomList->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    qTableViewScomList->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    qTableViewScomList->horizontalHeader()->setHighlightSections(true);
-    qTableViewScomList->horizontalHeader()->setStretchLastSection(false);
-
+    qTableViewScomList->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+//    qTableViewScomList->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+//    qTableViewScomList->horizontalHeader()->setHighlightSections(true);
+//    qTableViewScomList->horizontalHeader()->setStretchLastSection(true);
+    qTableViewScomList->horizontalHeader()->resizeSections(QHeaderView::Stretch);
 
     sListCommandListHeader << "CMDID" << "ADDR" << "DATA" << "FILE"
                            << "EXPACK" << "EXPDATA"
